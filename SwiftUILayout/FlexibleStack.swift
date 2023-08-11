@@ -31,7 +31,7 @@ struct FlexibleStack : Layout {
             for size in row.viewsSizes {
                 guard let view = subviews.popFirst() else { return }
                 let width = size.width
-                view.place(at: origin, proposal: proposal)
+                view.place(at: origin, proposal: .init(size))
                 origin.x += width + spacing
             }
             //move to the next row
@@ -65,27 +65,31 @@ struct FlexibleStack : Layout {
         var viewSizes : [CGSize] = []
         var rowHeight : CGFloat = 0
         var origin = CGRect.zero.origin
-        var isRowFilled = false
-        
+        var hasSpace : (CGSize) -> Bool = {(origin.x + $0.width + spacing) <= maxWidth}
         //keep iterating untill row is filled
-        while !isRowFilled {
+        while true {
             // if no views left
-            guard let view = subviews.popFirst() else {
+            //if view size bigger than available space
+            guard
+                let size = subviews.first?.sizeThatFits(proposal),
+                hasSpace(size)
+            else {
                 let rowSize = CGSize(width: origin.x - spacing , height: rowHeight)
                 return viewSizes.isEmpty ? nil : .init(viewsSizes: viewSizes, size: rowSize)
             }
             
-            let size = view.sizeThatFits(proposal)
+            _ = subviews.popFirst()
             viewSizes.append(size)
             rowHeight = rowHeight > size.height ? rowHeight : size.height
             origin.x += (size.width + spacing)
-            isRowFilled = (origin.x + size.width + spacing) > maxWidth
             
         }
         
         let rowSize = CGSize(width: origin.x - spacing , height: rowHeight)
         return viewSizes.isEmpty ? nil : .init(viewsSizes: viewSizes, size: rowSize)
     }
+    
+    
 }
 
 

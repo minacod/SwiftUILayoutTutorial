@@ -11,7 +11,7 @@ import Fakery
 struct TagList: View {
     
     let list : [Tag] = .mocks()
-    @State var selectedTags : [Tag] = []
+    @State var selectedTags : Set<Tag> = []
     
     @Namespace private var animation
     
@@ -26,7 +26,7 @@ struct TagList: View {
             FlexibleStack(spacing: 10, alignment: .leading){
                 
                 listBuilder(
-                    list: selectedTags,
+                    list: Array(selectedTags),
                     action: removeTag(_:),
                     label: selectedItem
                 )
@@ -82,15 +82,16 @@ struct TagList: View {
     }
     
     func addTag(_ tag: Tag) {
-        withAnimation() {
-            selectedTags.append(tag)
+        withAnimation {
+            selectedTags.insert(tag)
         }
     }
     
     func removeTag(_ tag: Tag) {
-        withAnimation() {
-            selectedTags.removeAll(where: {$0 == tag})
-        }    }
+        withAnimation {
+            selectedTags.remove(tag)
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {

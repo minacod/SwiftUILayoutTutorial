@@ -8,7 +8,7 @@
 import Foundation
 import Fakery
 
-struct Tag: Equatable, Identifiable {
+struct Tag: Hashable, Identifiable {
     let id: String = UUID().uuidString
     var name: String
     
